@@ -1,0 +1,172 @@
+NN responsible for predicting all hits. This is gonna be the base for the next steps, as this one, together with R-trees will help select which hits are the ones from the actual track.
+
+Steps: (T1 station)
+1. Select a X0 hit
+2. Use the NN model to predict the next hits.
+3. Use the prediction to select in the given layer (with R-tree intersection) +/- 300mm near hits.
+4. Sort the hits based on the distance to the predicted one.
+5. Use some classification algorithm to select hits from the given group of selected hits per layer.
+
+- Prediction last hit X1 from X0 (X0-U-V-X1)
+    
+    NN Structure:
+    _________________________________________________________________
+    Layer (type)                 Output Shape              Param #   
+    =================================================================
+    dense_18 (Dense)             (None, 12)                36        
+    _________________________________________________________________
+    dense_19 (Dense)             (None, 12)                156       
+    _________________________________________________________________
+    dense_20 (Dense)             (None, 1)                 13        
+    =================================================================
+    
+    Input:
+    [X_final[0], <numero layer (e.g 1,2,3)>]
+    Output:
+    [X_final[3]]
+    
+    Acc: 0.0176
+    
+    With 8 last hits:
+        Mean found 3: 0.864407
+        Mean total found 3: 7.217514
+        Mean pos found 3: 1.844633
+        
+    With 10 last hits:
+        Mean found 3: 0.909605
+        Mean total found 3: 8.720339
+        Mean pos found 3: 2.225989
+
+    With 15 last hits:
+        Mean found 3: 0.954802
+        Mean total found 3: 11.824859
+        Mean pos found 3: 2.742938
+        
+        
+- Prediction of 3 hits layer
+
+    NN Structure:
+    _________________________________________________________________
+    Layer (type)                 Output Shape              Param #   
+    =================================================================
+    dense_3 (Dense)              (None, 12)                36        
+    _________________________________________________________________
+    dense_4 (Dense)              (None, 12)                156       
+    _________________________________________________________________
+    dense_5 (Dense)              (None, 3)                 39        
+    =================================================================
+    
+    Input:
+    [X_final[0], <numero layer (e.g 1,2,3)>]
+    Output:
+    [X_final[1], X_final[2], X_final[3]]
+    
+    Acc: 0.4439
+    
+    With 8 last hits:
+        Mean found 1: 0.889831
+        Mean total found 1: 7.268362
+        Mean pos found 1: 1.485876
+
+        Mean found 2: 0.887006
+        Mean total found 2: 7.412429
+        Mean pos found 2: 1.644068
+
+        Mean found 3: 0.875706
+        Mean total found 3: 7.211864
+        Mean pos found 3: 1.296610
+
+        Mean Total Found: 0.765537
+        
+    With 10 last hits:
+        Mean found 1: 0.915254
+        Mean total found 1: 8.723164
+        Mean pos found 1: 1.703390
+
+        Mean found 2: 0.906780
+        Mean total found 2: 8.937853
+        Mean pos found 2: 1.810734
+
+        Mean found 3: 0.906780
+        Mean total found 3: 8.697740
+        Mean pos found 3: 1.559322
+        
+    With 15 last hits:
+        Mean found 1: 0.940678
+        Mean total found 1: 11.629944
+        Mean pos found 1: 1.991525
+
+        Mean found 2: 0.951977
+        Mean total found 2: 12.262712
+        Mean pos found 2: 2.344633
+
+        Mean found 3: 0.951977
+        Mean total found 3: 11.805085
+        Mean pos found 3: 2.096045
+
+        Mean Total Found: 0.867232
+
+- Mean prediction approach
+
+    NN Structure:
+    _________________________________________________________________
+    Layer (type)                 Output Shape              Param #   
+    =================================================================
+    dense (Dense)                (None, 12)                36        
+    _________________________________________________________________
+    dense_1 (Dense)              (None, 12)                156       
+    _________________________________________________________________
+    dense_2 (Dense)              (None, 1)                 13        
+    =================================================================
+
+    Input:
+    [X_final[0], <numero layer (e.g 1,2,3)>]
+    Output:
+    (X_final[0] + X_final[1] + X_final[2] + X_final[3]) / 4
+
+    Acc: 0.0 (No idea why...)
+    
+    With 8 last hits:
+        Mean found 1: 0.895480
+        Mean total found 1: 7.257062
+        Mean pos found 1: 1.426554
+
+        Mean found 2: 0.872881
+        Mean total found 2: 7.406780
+        Mean pos found 2: 1.632768
+
+        Mean found 3: 0.850282
+        Mean total found 3: 7.217514
+        Mean pos found 3: 1.824859
+
+        Mean Total Found: 0.742938
+    
+    With 10 last hits:
+        Mean found 1: 0.915254
+        Mean total found 1: 8.709040
+        Mean pos found 1: 1.590395
+
+        Mean found 2: 0.898305
+        Mean total found 2: 8.937853
+        Mean pos found 2: 1.850282
+
+        Mean found 3: 0.892655
+        Mean total found 3: 8.709040
+        Mean pos found 3: 2.180791
+
+        Mean Total Found: 0.793785
+
+    With 15 last hits:
+        Mean found 1: 0.940678
+        Mean total found 1: 11.627119
+        Mean pos found 1: 1.864407
+
+        Mean found 2: 0.949153
+        Mean total found 2: 12.254237
+        Mean pos found 2: 2.437853
+
+        Mean found 3: 0.946328
+        Mean total found 3: 11.861582
+        Mean pos found 3: 2.807910
+
+        Mean Total Found: 0.858757
