@@ -65,3 +65,41 @@ With only 15 hit max: (with 7174 tracks)
     Mean pos found 2: 2.141623
 
     Mean Total Found: 0.679955
+    
+Track reconstruction using the track_classifier NN
+
+- Created a track with at least one hit similar to the real one:
+
+    Mean found 3: 0.944476
+    Mean total found 3: 12.773734
+    Mean pos found 3: 3.217779
+
+    Mean found 2: 0.945196
+    Mean total found 2: 12.761220
+    Mean pos found 2: 2.886507
+
+    Mean Total Found: 0.308257
+
+- As it can be seen, there are too much tracks found, so it is not really a viable solution.
+    
+Next version of the algorithm shows:
+    
+    The logic behind this new version is:
+    - Iterate over all hits found from outwards (last X layer) towards the U-layer. For inside for, inside for. 
+    - For each hit predicted in the last U-layer, a comparison between this one and the 
+    last one, in terms of height is done. Discarding the ones with more than 15 difference between. 
+    - Create tracks for each combination of hits that have less than 15 of difference and collect their height in a separate list.
+    - Once hit combination per each layer is done, iterate over possible valid height hits and sort list based on the less difference between the actual height iteration.
+    - Get the first value of each sorted list to create track candidate.
+    
+    - Results
+        Event 1/5 	 Acc: 0.720000 Size 2.946667 Repeated: 0.447964
+        Event 2/5 	 Acc: 0.685714 Size 3.371429 Repeated: 0.326271
+        Event 3/5 	 Acc: 0.578431 Size 3.078431 Repeated: 0.302548
+        Event 4/5 	 Acc: 0.652632 Size 2.073684 Repeated: 0.502538
+        Event 5/5 	 Acc: 0.485714 Size 4.205714 Repeated: 0.216033
+
+        Final Result:
+            Mean: 0.624498
+            Size: 3.135185
+            Repeated: 0.338229
