@@ -103,3 +103,74 @@ Next version of the algorithm shows:
             Mean: 0.624498
             Size: 3.135185
             Repeated: 0.338229
+
+I found out that the actual implementation of the algorithm is not actually working correctly, this is because I was iterating over particles rather over hits, which is what I would be finding out when executing the track reconstruction algorithm. Because of this, I have changed the structure of the algorithm for a first version:
+
+    Results:
+        Time to evaluate all tracks: 3.5686588287353516
+        Event 1/5 	 Acc: 0.313953 Ghost: 0.116279
+        
+        Time to evaluate all tracks: 17.64958930015564
+        Event 2/5 	 Acc: 0.233333 Ghost: 0.288889
+        
+        Time to evaluate all tracks: 22.657678365707397
+        Event 3/5 	 Acc: 0.222222 Ghost: 0.190476
+        
+        Time to evaluate all tracks: 18.614060640335083
+        Event 4/5 	 Acc: 0.174757 Ghost: 0.194175
+        
+        Time to evaluate all tracks: 46.79869055747986
+        Event 5/5 	 Acc: 0.190476 Ghost: 0.275132
+        
+    Pretty bad, the idea is the following:
+    - Reconstruct all tracks differently from each station, this is, create a index tree (rtree) with all tracks reconstructed, with different position for each station.
+    - Once all tracks are reconstructed from each station, iterate over all available tracks in the first station:
+    - For each first station track, look for second and third station track candidates based on a prediction from a NN, which has:
+    
+        * Input/output:
+            In: [X_final[0], X_final[1], h1, X_final[2], h2, X_final[3]]
+            Out: [X_final[4], h3, h4, X_final[8], h5, h6]
+        * Structure
+            _________________________________________________________________
+            Layer (type)                 Output Shape              Param #   
+            =================================================================
+            dense_15 (Dense)             (None, 12)                84        
+            _________________________________________________________________
+            dense_16 (Dense)             (None, 8)                 104       
+            _________________________________________________________________
+            dense_17 (Dense)             (None, 8)                 72        
+            _________________________________________________________________
+            dense_18 (Dense)             (None, 6)                 54        
+            =================================================================
+            
+            45998/45998 [==============================] - 1s 19us/sample - loss: 330202.2550 - acc: 0.6412 - val_loss: 53362.9105 - val_acc: 0.6560
+            
+    - Then execute a index intersection: (being next_tracks the output of the NN)
+        list(track_tree.intersection((next_tracks[0] - 150, next_tracks[0] + 150, min_h - 80, max_h + 80, 1, 1), objects='raw'))
+    - Next once I have a list from each r-tree, validate each first, second and third track to find the best candidate using another NN:
+        
+        * Input/output:
+            In: track[0][:6] + track[1][:6] + track[2][:6]
+            Out: 1/0 (being 1 when all three tracks has 6 or more same hits between each station track)
+        * Structure
+            _________________________________________________________________
+            Layer (type)                 Output Shape              Param #   
+            =================================================================
+            dense (Dense)                (None, 24)                456       
+            _________________________________________________________________
+            dense_1 (Dense)              (None, 8)                 200       
+            _________________________________________________________________
+            dense_2 (Dense)              (None, 8)                 72        
+            _________________________________________________________________
+            dense_3 (Dense)              (None, 1)                 9         
+            =================================================================
+            Total params: 737
+            Trainable params: 737
+            Non-trainable params: 0
+            _________________________________________________________________
+            Epoch 15/15 71806/71806 [==============================] - 6s 81us/sample - loss: 0.3094 - acc: 0.8794 - val_loss: 0.2526 - val_acc: 0.9128
+                
+                X Train length: 79785
+                X Test Length 26596
+                Y Train length: 79785
+                Y Test length: 26596

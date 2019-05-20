@@ -7,6 +7,15 @@ Steps: (T1 station)
 4. Sort the hits based on the distance to the predicted one.
 5. Use some classification algorithm to select hits from the given group of selected hits per layer.
 
+- If changed the NN structure:
+
+    * Predict from the first hit, the last one (plot name: X11_pred_NN_m1)
+    * Predict from all the first station hits the last one (plot name: X11_pred_NN_m2) (Pretty good)
+    * Predict from the first hit, the 8 layer (plot name: X8_pred_NN_m1)
+    * Predict from the first hit, the 4 layer with the predicted third hit (analytically) (plot name: X4_pred_NN_m1)
+    * Predict from the first hit, the 2nd layer (plot name: U1_pred_NN_m1)
+
+
 - Prediction last hit X1 from X0 (X0-U-V-X1)
     
     NN Structure:
