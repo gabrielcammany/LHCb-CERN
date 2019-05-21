@@ -105,22 +105,6 @@ Next version of the algorithm shows:
             Repeated: 0.338229
 
 I found out that the actual implementation of the algorithm is not actually working correctly, this is because I was iterating over particles rather over hits, which is what I would be finding out when executing the track reconstruction algorithm. Because of this, I have changed the structure of the algorithm for a first version:
-
-    Results:
-        Time to evaluate all tracks: 3.5686588287353516
-        Event 1/5 	 Acc: 0.313953 Ghost: 0.116279
-        
-        Time to evaluate all tracks: 17.64958930015564
-        Event 2/5 	 Acc: 0.233333 Ghost: 0.288889
-        
-        Time to evaluate all tracks: 22.657678365707397
-        Event 3/5 	 Acc: 0.222222 Ghost: 0.190476
-        
-        Time to evaluate all tracks: 18.614060640335083
-        Event 4/5 	 Acc: 0.174757 Ghost: 0.194175
-        
-        Time to evaluate all tracks: 46.79869055747986
-        Event 5/5 	 Acc: 0.190476 Ghost: 0.275132
         
     Pretty bad, the idea is the following:
     - Reconstruct all tracks differently from each station, this is, create a index tree (rtree) with all tracks reconstructed, with different position for each station.
@@ -174,3 +158,21 @@ I found out that the actual implementation of the algorithm is not actually work
                 X Test Length 26596
                 Y Train length: 79785
                 Y Test length: 26596
+    - After selecting the union which works best, I end up with a list of combinations of [First, second , third], as before was selecting which one was better for a first-second combination. 
+    - Execute another NN classifing with the same NN as before to select the final First, Second and Third combination.
+    - End up with a validation of results, and... 
+        Results:
+            Time to evaluate all tracks: 3.5686588287353516
+            Event 1/5 	 Acc: 0.313953 Ghost: 0.116279
+            
+            Time to evaluate all tracks: 17.64958930015564
+            Event 2/5 	 Acc: 0.233333 Ghost: 0.288889
+            
+            Time to evaluate all tracks: 22.657678365707397
+            Event 3/5 	 Acc: 0.222222 Ghost: 0.190476
+            
+            Time to evaluate all tracks: 18.614060640335083
+            Event 4/5 	 Acc: 0.174757 Ghost: 0.194175
+            
+            Time to evaluate all tracks: 46.79869055747986
+            Event 5/5 	 Acc: 0.190476 Ghost: 0.275132
